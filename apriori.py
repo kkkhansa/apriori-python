@@ -3,7 +3,8 @@ import os.path
 import csv
 import math 
 import types
-from collections import defaultdict, Iterable
+from collections import defaultdict
+from collections.abc import Iterable
 import itertools
 
 class Apriori:
@@ -29,7 +30,7 @@ class Apriori:
         k=2
         while len(self.F[k-1]) != 0:
             candidate[k] = self.candidateGen(self.F[k-1], k)
-            for t in self.transList.iteritems():
+            for t in self.transList.items():
                 for c in candidate[k]:
                     if set(c).issubset(t[1]):
                         self.freqList[c] += 1
@@ -87,7 +88,7 @@ class Apriori:
     def genRules(self, F):
         H = []
 
-        for k, itemset in F.iteritems():
+        for k, itemset in F.items():
             if k >= 2:
                 for item in itemset:
                     subsets = self.genSubsets(item)
@@ -118,7 +119,7 @@ class Apriori:
 
     def firstPass(self, items, k):
         f = []
-        for item, count in items.iteritems():
+        for item, count in items.items():
             support = self.support(count)
             if support == 1:
                 self.highSupportList.append(item)
@@ -155,7 +156,7 @@ def main():
 
     # Make sure the right number of input files are specified
     if  num_args < 4 or num_args > 5:
-        print 'Expected input format: python apriori.py <dataset.csv> <minSup> <minConf>'
+        print('Expected input format: python apriori.py <dataset.csv> <minSup> <minConf>')
         return
     elif num_args == 5 and sys.argv[1] == "--no-rules":
         dataset = csv.reader(open(sys.argv[2], "r"))
@@ -163,15 +164,15 @@ def main():
         minSup  = float(sys.argv[3])
         minConf = float(sys.argv[4])
         noRules = True
-        print "Dataset: ", sys.argv[2], " MinSup: ", minSup, " MinConf: ", minConf
+        print("Dataset: ", sys.argv[2], " MinSup: ", minSup, " MinConf: ", minConf)
     else: 
         dataset = csv.reader(open(sys.argv[1], "r"))
         goodsData = csv.reader(open('goods.csv', "r"))
         minSup  = float(sys.argv[2])
         minConf = float(sys.argv[3])
-        print "Dataset: ", sys.argv[1], " MinSup: ", minSup, " MinConf: ", minConf
+        print("Dataset: ", sys.argv[1], " MinSup: ", minSup, " MinConf: ", minConf)
 
-    print "=================================================================="
+    print("==================================================================")
 
     for item in goodsData:
         goods[item[0]] = item[1:]
@@ -181,19 +182,19 @@ def main():
     frequentItemsets = a.genAssociations()
 
     count = 0
-    for k, item in frequentItemsets.iteritems():
+    for k, item in frequentItemsets.items():
         for i in item:
             if k >= 2:
                 count += 1
-                print count,":  ",readable(i, goods),"\tsupport=",a.support(a.freqList[i])
+                print(count,":  ",readable(i, goods),"\tsupport=",a.support(a.freqList[i]))
 
-    print "Skyline Itemsets: ", count
+    print("Skyline Itemsets: ", count)
     if not noRules:
         rules = a.genRules(frequentItemsets)
         for i, rule in enumerate(rules):
-            print "Rule",i+1,":\t ",readable(rule[0], goods),"\t-->",readable(rule[1], goods),"\t [sup=",rule[2]," conf=",rule[3],"]"
+            print("Rule",i+1,":\t ",readable(rule[0], goods),"\t-->",readable(rule[1], goods),"\t [sup=",rule[2]," conf=",rule[3],"]")
 
-    print "\n"
+    print("\n")
 
 def readable(item, goods):
     itemStr = ''
